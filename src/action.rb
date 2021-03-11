@@ -107,3 +107,4 @@ class SubText
     serialize.to_s
   end
 end
+

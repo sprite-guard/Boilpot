@@ -58,3 +58,4 @@ class Fact
     return new_bindings
   end
 end
+
