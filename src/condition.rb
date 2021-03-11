@@ -168,8 +168,3 @@ class Condition
 
 end
 
-class Array
-  def ~()
-    Condition.new(self, false, false, true)
-  end
-end
