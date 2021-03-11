@@ -1,0 +1,55 @@
+facts:
+  george is alive
+  frank is alive
+  george has gold
+  gold is treasure
+  frank has gun
+  frank wants treasure
+  gun is weapon
+  clint is sheriff
+
+when:
+  :a is alive
+  :a has :x
+  :x is :y
+  :b wants :y
+  :b has :z
+  :z is weapon
+then:
+  ~:a is alive
+  :a is dead
+  :b killed :a
+report:
+  :b shot :a because :a had :x and :b wanted it!
+
+when:
+  :a has :x
+  :x is :y
+  :b wants :y
+unless:
+  :a is alive
+then:
+  :b has :x
+report:
+  :b took the :x from :a
+
+when:
+  :a is sheriff
+  :b killed :c
+then:
+  :a suspects :b
+report:
+  :a found :c 's body, and deduced that :b was the murderer
+  
+when:
+  :a is sheriff
+  :a suspects :b
+  :b killed :c
+  :b has :x
+  :x is weapon
+then:
+  :b is dead
+  ~:b is alive
+report:
+  As :a pursued :b , :b brandished a :x , but :a immediately shot :b
+  
