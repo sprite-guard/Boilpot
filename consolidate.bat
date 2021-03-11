@@ -1,1 +1,1 @@
-type src\action.rb src\parser.rb src\condition.rb src\fact.rb > boilpot.rb
+type src\scenario.rb src\condition.rb src\action.rb src\fact.rb src\parser.rb > boilpot.rb
