@@ -246,7 +246,6 @@ class Condition
 
 end
 
-
 class Action
 
   attr_reader :id
@@ -529,3 +528,4 @@ module Boilpot
     return state
   end
 end
+
