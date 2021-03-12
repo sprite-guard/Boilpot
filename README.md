@@ -58,12 +58,20 @@ of these facts, their logical structure and meaning are supplied by the
 conditions and actions. They can have any number of words in them, and any
 grammatical structure.
 
+If a fact line starts with `<>`, it is treated as a symmetric fact, both it and
+its (word-for-word) reversal will be set. So for example the line `<>Johnny respects Buster`
+would add both `Johnny respects Buster` and `Buster respects Johnny` to the pool
+of facts. Be careful when using more than three words, because something like
+`<>Johnny Dollar respects Buster Lefevre` will get turned into
+`Lefevre Buster respects Dollar Johnny`.
+
 ```
 facts:
   charles is alive
   charles has treasure
   frank is alive
   frank wants treasure
+<>frank hates charles
 ```
 
 ## When
