@@ -495,7 +495,13 @@ module Boilpot
     state = old_state.dup
     case state[0]
     when :facts
-      state[1][:scene].set desc
+      if(desc[0][0,2] == "<>")
+        desc[0] = desc[0][2..-1]
+        state[1][:scene].set desc
+        state[1][:scene].set desc.reverse
+      else
+        state[1][:scene].set desc
+      end
     when :when
       c = Condition.new(desc)
       if state[1][:pending_cond]
