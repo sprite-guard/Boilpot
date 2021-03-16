@@ -1,0 +1,99 @@
+facts:
+<>Warbride enemies Yarrow
+<>Yarrow enemies GoldenYarrow
+<>GoldenYarrow allies YellowClay
+  YellowClay enemies SouthernAlliance
+  WhiteShale member SouthernAlliance
+  IronBrick member SouthernAlliance
+  GodGiven member SouthernAlliance
+<>NorthernKingdoms allies Yarrow
+<>FoothillTribes allies YellowClay
+<>SofiaResistance enemies Warbride
+<>SofiaResistance allies Mu
+<>Mu enemies IronBrick
+  YellowClay member NorthernKingdoms
+  BrightWheel member NorthernKingdoms
+  Birchwood member NorthernKingdoms
+
+until:
+  :a member :x
+  :b member :x
+unless:
+  :a allies :b
+then:
+  :a allies :b
+  :b allies :a
+report:
+  :a and :b join together as part of :x
+
+when:
+  :a enemies :x
+  :b member :x
+unless:
+  :a enemies :b
+then:
+  :a enemies :b
+report:
+  The relationship between :a and :b soured when :b chose to join :x
+
+when:
+  :a enemies :x
+  :b member :x
+  :a allies :b
+then:
+  ~:a allies :b
+  ~:b allies :a
+report:
+  The alliance between :a and :b broke down when :b joined :x
+
+when:
+  :a allies :b
+  :b member :x
+unless:
+  :a member :x
+then:
+  :a wantjoin :x
+report:
+  :a petitioned to join :x to strengthen their position.
+  
+when:
+  :a member :x
+  :b wantjoin :x
+  :a enemies :b
+then:
+  ~:b wantjoin :x
+  :b blocked :x
+report:
+  :a blocked :b from joining :x
+
+when:
+  :a wantjoin :x
+  :a allies :b
+unless:
+  :a member :x
+then:
+  :a member :x
+  ~:a wantjoin :x
+report:
+  :b sponsored :a to become a member of :x
+
+when:
+  :a allies :b
+  :a enemies :c
+unless:
+  :b enemies :c
+then:
+  :b enemies :c
+  :c enemies :b
+report:
+  :a convinced :b to join them in condemning :c
+
+when:
+  :a enemies :x
+  :b enemies :x
+unless:
+  :a enemies :b
+then:
+  :a allies :b
+report:
+  :a and :b formed an alliance to resist their common enemy :x
