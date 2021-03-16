@@ -156,6 +156,9 @@ class Condition
     context = match(facts)
     if(context)
       @action.bind_assertions(context).apply(parent)
+      return true
+    else
+      return false
     end
   end
   

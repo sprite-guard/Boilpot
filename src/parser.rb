@@ -5,7 +5,8 @@ module Boilpot
     :when => true,
     :unless => true,
     :then => true,
-    :report => true
+    :report => true,
+    :until => true
   }
 
   def Boilpot.parse doc
@@ -35,8 +36,13 @@ module Boilpot
 
     elsif line == ""
       if state[1][:close]
-        state[1][:scene].when(state[1][:pending_cond],state[1][:pending_act])
+        if state[1][:pending_precondition]
+          state[1][:scene].until(state[1][:pending_cond],state[1][:pending_act])
+        else
+          state[1][:scene].when(state[1][:pending_cond],state[1][:pending_act])
+        end
         state[1][:pending_cond] = false
+        state[1][:pending_precondition] = false
         state[1][:pending_act] = false
         state[1][:close] = false
       end
@@ -46,7 +52,6 @@ module Boilpot
 
       phrase = line.strip
       
-
     elsif state[0] == :start
       raise "Boilpot programs must start with a section heading"
     else
@@ -82,6 +87,14 @@ module Boilpot
         state[1][:scene].set desc.reverse
       else
         state[1][:scene].set desc
+      end
+    when :until
+      state[1][:pending_precondition] = true
+      c = Condition.new(desc)
+      if state[1][:pending_cond]
+        state[1][:pending_cond] = state[1][:pending_cond] & c
+      else
+        state[1][:pending_cond] = c
       end
     when :when
       c = Condition.new(desc)

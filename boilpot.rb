@@ -1,10 +1,14 @@
 class Scenario
 
   attr_reader :facts, :log, :conditions
+  
+  @@MaxIterations = 100
 
   def initialize
     @facts = Hash.new(false)
+    @facts_order = []
     @conditions = []
+    @preconditions = []
     @log = []
   end
   
@@ -19,6 +23,7 @@ class Scenario
       return true
     else
       @facts[fact_id] = Fact.new(fact)
+      @facts_order = @facts.keys
     end
   end
   
@@ -34,7 +39,9 @@ class Scenario
   end
   
   def each_fact &f
-    @facts.map &f
+    @facts_order.map do |id|
+      yield(@facts[:id])
+    end
   end
   
   def bulk_set fact_length, word_list
@@ -47,15 +54,37 @@ class Scenario
     @conditions << (Condition.wrap(condition,self) >> consequence)
   end
   
+  def until condition, consequence
+    @preconditions << (Condition.wrap(condition,self) >> consequence)
+  end
+  
   def shuffle
     @conditions.shuffle
-    @facts.shuffle
+    @facts_order.shuffle
   end
   
   def seek
     @conditions.each do |c|
       c << facts
     end
+  end
+  
+  def prerun
+    @@MaxIterations.times do |t|
+      keep_going = false
+      @preconditions.each do |c|
+        found = c << facts
+        if found
+          keep_going = true
+        else
+          # puts "no match for precondition"
+        end
+      end
+      if !keep_going
+        return
+      end
+    end
+    raise "scenario#prerun: max iterations exceeded"
   end
   
   def serialize
@@ -234,6 +263,9 @@ class Condition
     context = match(facts)
     if(context)
       @action.bind_assertions(context).apply(parent)
+      return true
+    else
+      return false
     end
   end
   
@@ -424,7 +456,8 @@ module Boilpot
     :when => true,
     :unless => true,
     :then => true,
-    :report => true
+    :report => true,
+    :until => true
   }
 
   def Boilpot.parse doc
@@ -454,8 +487,13 @@ module Boilpot
 
     elsif line == ""
       if state[1][:close]
-        state[1][:scene].when(state[1][:pending_cond],state[1][:pending_act])
+        if state[1][:pending_precondition]
+          state[1][:scene].until(state[1][:pending_cond],state[1][:pending_act])
+        else
+          state[1][:scene].when(state[1][:pending_cond],state[1][:pending_act])
+        end
         state[1][:pending_cond] = false
+        state[1][:pending_precondition] = false
         state[1][:pending_act] = false
         state[1][:close] = false
       end
@@ -465,7 +503,6 @@ module Boilpot
 
       phrase = line.strip
       
-
     elsif state[0] == :start
       raise "Boilpot programs must start with a section heading"
     else
@@ -501,6 +538,14 @@ module Boilpot
         state[1][:scene].set desc.reverse
       else
         state[1][:scene].set desc
+      end
+    when :until
+      state[1][:pending_precondition] = true
+      c = Condition.new(desc)
+      if state[1][:pending_cond]
+        state[1][:pending_cond] = state[1][:pending_cond] & c
+      else
+        state[1][:pending_cond] = c
       end
     when :when
       c = Condition.new(desc)
