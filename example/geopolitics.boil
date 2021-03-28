@@ -1,3 +1,5 @@
+# test comment
+
 facts:
 <>Warbride enemies Yarrow
 <>Yarrow enemies GoldenYarrow
@@ -14,7 +16,7 @@ facts:
   YellowClay member NorthernKingdoms
   BrightWheel member NorthernKingdoms
   Birchwood member NorthernKingdoms
-
+# another test comment
 until:
   :a member :x
   :b member :x

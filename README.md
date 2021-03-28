@@ -44,8 +44,9 @@ then:
 report:
 ```
 
-Sections must be separated by blank lines (lines with only whitespace) and the
-file must end with a blank line.
+Any line starting with `#` is a comment. Comments must start on their own line.
+Sections must be separated by lines containing only whitespace or comments,
+and the file must end with a blank line or comment.
 
 ## Facts
 

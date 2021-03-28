@@ -33,7 +33,7 @@
         raise "Unknown state at line #{index}: #{new_state.to_s}"
       end
 
-    elsif line == ""
+    elsif line == "" || line[0] == "#"
       if state[1][:close]
         if state[1][:pending_precondition]
           state[1][:scene].until(state[1][:pending_cond],state[1][:pending_act])
