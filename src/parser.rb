@@ -1,4 +1,3 @@
-module Boilpot
 
   Boilpot::StateFunction = {
     :facts => true,
@@ -127,5 +126,4 @@ module Boilpot
     
     return state
   end
-end
 
