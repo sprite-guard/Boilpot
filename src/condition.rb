@@ -59,6 +59,7 @@
       @test = Pattern.wrap(pattern)
       @tail = Condition.wrap(tail, parent, false, false)
       @parent = parent
+      @forbidden = Hash.new
       @complement = complement
       @id = "C" + @@id.to_s
       @@id += 1
@@ -76,11 +77,18 @@
     def to_s
       serialize.to_s
     end
+    
+    def forbid k, v
+      @forbidden[k] = v
+      if @tail
+        @tail.forbid k, v
+      end
+    end
         
     
     def match facts, bindings={}
       facts.each do |id,fact|
-        next_match = fact.match @test, bindings
+        next_match = fact.match @test, bindings, @forbidden
         if next_match
           if @tail
             # recursive case:

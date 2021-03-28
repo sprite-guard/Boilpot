@@ -168,6 +168,7 @@ module Boilpot
       @test = Pattern.wrap(pattern)
       @tail = Condition.wrap(tail, parent, false, false)
       @parent = parent
+      @forbidden = Hash.new
       @complement = complement
       @id = "C" + @@id.to_s
       @@id += 1
@@ -185,11 +186,18 @@ module Boilpot
     def to_s
       serialize.to_s
     end
+    
+    def forbid k, v
+      @forbidden[k] = v
+      if @tail
+        @tail.forbid k, v
+      end
+    end
         
     
     def match facts, bindings={}
       facts.each do |id,fact|
-        next_match = fact.match @test, bindings
+        next_match = fact.match @test, bindings, @forbidden
         if next_match
           if @tail
             # recursive case:
@@ -408,7 +416,7 @@ module Boilpot
       @@id += 1
     end
     
-    def match(pattern,bindings=Hash.new(false))
+    def match(pattern,bindings=Hash.new(false),forbidden=Hash.new)
       new_bindings = bindings.dup
       pattern.each_with_index do |item, index|
         # every element of the fact is a string,
@@ -420,8 +428,12 @@ module Boilpot
         if(item.is_a? Symbol)
         
           if !new_bindings[item]
-            # don't bind the same word to multiple variables
+          
             if new_bindings.key(@words[index])
+              # don't bind the same word to multiple variables
+              return false
+            elsif forbidden[item] == @words[index]
+              # don't bind a forbidden value
               return false
             else
               # the variable at [index] is free
@@ -526,10 +538,10 @@ module Boilpot
       end
     end
 
-    Boilpot.step state, descriptor
+    Boilpot.step state, descriptor, index
   end
   
-  def Boilpot.step old_state, desc
+  def Boilpot.step old_state, desc, lineno
     state = old_state.dup
     case state[0]
     when :facts
@@ -556,11 +568,19 @@ module Boilpot
         state[1][:pending_cond] = c
       end
     when :unless
-      c = Condition.new(desc)
-      if state[1][:pending_cond]
-        state[1][:pending_cond] = state[1][:pending_cond] & (~c)
+      if(desc[0].to_s[0] == "=")
+        k = desc[0][1..-1].to_sym
+        v = desc[1]
+        if state[1][:pending_cond]
+          state[1][:pending_cond].forbid(k, v)
+        end
       else
-        state[1][:pending_cond] = (~c)
+        c = Condition.new(desc)
+        if state[1][:pending_cond]
+          state[1][:pending_cond] = state[1][:pending_cond] & (~c)
+        else
+          state[1][:pending_cond] = (~c)
+        end
       end
     when :then
       if !state[1][:pending_act]

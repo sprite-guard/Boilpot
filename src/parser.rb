@@ -73,10 +73,10 @@
       end
     end
 
-    Boilpot.step state, descriptor
+    Boilpot.step state, descriptor, index
   end
   
-  def Boilpot.step old_state, desc
+  def Boilpot.step old_state, desc, lineno
     state = old_state.dup
     case state[0]
     when :facts
@@ -103,11 +103,19 @@
         state[1][:pending_cond] = c
       end
     when :unless
-      c = Condition.new(desc)
-      if state[1][:pending_cond]
-        state[1][:pending_cond] = state[1][:pending_cond] & (~c)
+      if(desc[0].to_s[0] == "=")
+        k = desc[0][1..-1].to_sym
+        v = desc[1]
+        if state[1][:pending_cond]
+          state[1][:pending_cond].forbid(k, v)
+        end
       else
-        state[1][:pending_cond] = (~c)
+        c = Condition.new(desc)
+        if state[1][:pending_cond]
+          state[1][:pending_cond] = state[1][:pending_cond] & (~c)
+        else
+          state[1][:pending_cond] = (~c)
+        end
       end
     when :then
       if !state[1][:pending_act]

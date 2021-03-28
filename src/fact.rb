@@ -16,7 +16,7 @@
       @@id += 1
     end
     
-    def match(pattern,bindings=Hash.new(false))
+    def match(pattern,bindings=Hash.new(false),forbidden=Hash.new)
       new_bindings = bindings.dup
       pattern.each_with_index do |item, index|
         # every element of the fact is a string,
@@ -28,8 +28,12 @@
         if(item.is_a? Symbol)
         
           if !new_bindings[item]
-            # don't bind the same word to multiple variables
+          
             if new_bindings.key(@words[index])
+              # don't bind the same word to multiple variables
+              return false
+            elsif forbidden[item] == @words[index]
+              # don't bind a forbidden value
               return false
             else
               # the variable at [index] is free

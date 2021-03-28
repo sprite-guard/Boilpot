@@ -82,6 +82,7 @@ when:
   :a enemies :c
 unless:
   :b enemies :c
+  =c Yarrow
 then:
   :b enemies :c
   :c enemies :b
