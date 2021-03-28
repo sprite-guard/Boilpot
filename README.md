@@ -100,6 +100,15 @@ unless:
   :a is alive
 ```
 
+It is also possible to forbid variables from binding to specific values.
+
+```
+unless:
+  =a foo
+```
+
+This will cause any match that binds `:a` to `foo` to fail.
+
 ## Then
 
 The `then` block begins the description of the Action. This has two parts:
